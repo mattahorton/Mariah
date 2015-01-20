@@ -11,9 +11,12 @@
 #import <UIKit/UIKit.h>
 #import <GLKit/GLKit.h>
 #import "AEAudioController.h"
+#import "PPSSignatureView.h"
 
-@interface MHViewController : GLKViewController;
+@interface MHViewController : GLKViewController
 
 @property (nonatomic) AEAudioController *audioController;
+
+- (void)yValueReturned:(float)y;
 
 @end

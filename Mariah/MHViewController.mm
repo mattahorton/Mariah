@@ -8,7 +8,6 @@
 
 #import "MHViewController.h"
 #import "MHCore.h"
-#import "PPSSignatureView.h"
 #import <OpenGLES/ES2/glext.h>
 
 @interface MHViewController()
@@ -37,8 +36,8 @@
 //    GLKView *view = (GLKView *)self.view;
 //    view.context = self.context;
 //    view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
-    CGRect mainScreen = [[UIScreen mainScreen] bounds];
-    PPSSignatureView *view = [[PPSSignatureView alloc] initWithFrame:CGRectMake(mainScreen.size.width / 2, mainScreen.size.height / 2, 50, 50) context:self.context];
+//    CGRect mainScreen = [[UIScreen mainScreen] bounds];
+//    PPSSignatureView *view = [[PPSSignatureView alloc] initWithFrame:CGRectMake(mainScreen.size.width / 2, mainScreen.size.height / 2, 50, 50) context:self.context];
     
     [self setupGL];
     
@@ -95,6 +94,12 @@
 
 - (void)update
 {
+}
+
+- (void)yValueReturned:(float)y{
+    NSLog(@"%f",y);
+    self.core.mandolin->setFrequency(y);
+    self.core.mandolin->pluck(1);
 }
 
 @end

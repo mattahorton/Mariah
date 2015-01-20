@@ -46,6 +46,7 @@ float * g_big_bar_heights = NULL;
     AEBlockAudioReceiver *audioRec;
     AEBlockAudioReceiver *audioOut;
     AEAudioFilePlayer *player;
+    AEBlockChannel *mandolinChannel;
 }
 
 -(instancetype)initWithViewController:(MHViewController *) viewController {
@@ -59,6 +60,8 @@ float * g_big_bar_heights = NULL;
 }
 
 -(void) coreInit {
+    stk::Stk::setRawwavePath([[[NSBundle mainBundle] pathForResource:@"rawwaves" ofType:@"bundle"] UTF8String]);
+
     GLoilerInit();
     
     self.vc.audioController = [[AEAudioController alloc]
@@ -85,15 +88,29 @@ float * g_big_bar_heights = NULL;
     [player setCurrentTime:0];
     [player setVolume:0];
     
-    audioRec = [AEBlockAudioReceiver audioReceiverWithBlock:^(void *source, const AudioTimeStamp *time, UInt32 frames, AudioBufferList *audio) {}];
+    self.mandolin = new stk::Mandolin(400);
     
-    audioOut = [AEBlockAudioReceiver audioReceiverWithBlock:^(void *source, const AudioTimeStamp *time, UInt32 frames, AudioBufferList *audio) {}];
+    mandolinChannel = [AEBlockChannel channelWithBlock:^(const AudioTimeStamp  *time,
+                                                           UInt32 frames,
+                                                           AudioBufferList *audio) {
+        for ( int i=0; i<frames; i++ ) {
+            
+            ((float*)audio->mBuffers[0].mData)[i] =
+            ((float*)audio->mBuffers[1].mData)[i] = self.mandolin->tick();
+            
+        }
+    }];
     
-    [self.vc.audioController addInputReceiver:audioRec];
-    [self.vc.audioController addOutputReceiver:audioOut];
+    [self.vc.audioController addChannels:@[mandolinChannel]];
+    
+//    audioRec = [AEBlockAudioReceiver audioReceiverWithBlock:^(void *source, const AudioTimeStamp *time, UInt32 frames, AudioBufferList *audio) {}];
+//    
+//    audioOut = [AEBlockAudioReceiver audioReceiverWithBlock:^(void *source, const AudioTimeStamp *time, UInt32 frames, AudioBufferList *audio) {}];
+//    
+//    [self.vc.audioController addInputReceiver:audioRec];
+//    [self.vc.audioController addOutputReceiver:audioOut];
     [self.vc.audioController addChannels: @[player]];
     
-    stk::Stk::setRawwavePath([[[NSBundle mainBundle] pathForResource:@"rawwaves" ofType:@"bundle"] UTF8String]);
 }
 
 -(void) coreRender {

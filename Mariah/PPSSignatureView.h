@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <GLKit/GLKit.h>
 #import <OpenGLES/ES2/glext.h>
+#import "MHViewController.h"
 
 @interface PPSSignatureView : GLKView
 

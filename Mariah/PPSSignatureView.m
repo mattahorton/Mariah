@@ -12,6 +12,20 @@
 
 #define             MAXIMUM_VERTECES 100000
 
+@interface UIView (APIFix)
+- (UIViewController *)viewController;
+@end
+
+@implementation UIView (APIFix)
+
+- (UIViewController *)viewController {
+    if ([self.nextResponder isKindOfClass:UIViewController.class])
+        return (UIViewController *)self.nextResponder;
+    else
+        return nil;
+}
+@end
+
 
 static GLKVector3 StrokeColor = { 195.0/256.0,194.0/256.0,27.0/256.0 };
 static float clearColor[4] = { 104.0/256.0, 91.0/256.0, 224.0/256.0, 1 };
@@ -283,7 +297,8 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
     CGPoint v = [p velocityInView:self];
     CGPoint l = [p locationInView:self];
     
-    NSLog(@"%f",l.y);
+//    NSLog(@"%f",l.y);
+    [(MHViewController *)self.viewController yValueReturned:l.y];
     
     currentVelocity = ViewPointToGL(v, self.bounds, (GLKVector3){0,0,0});
     float distance = 0.;
