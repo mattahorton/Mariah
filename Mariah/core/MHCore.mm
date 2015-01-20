@@ -88,7 +88,8 @@ float * g_big_bar_heights = NULL;
     [player setCurrentTime:0];
     [player setVolume:0];
     
-    self.mandolin = new stk::Mandolin(400);
+    self.mandolin = new stk::Mandolin(100);
+    self.mandolin->noteOff(0.0);
     
     mandolinChannel = [AEBlockChannel channelWithBlock:^(const AudioTimeStamp  *time,
                                                            UInt32 frames,
@@ -101,6 +102,8 @@ float * g_big_bar_heights = NULL;
         }
     }];
     
+    [mandolinChannel setChannelIsMuted:YES];
+    
     [self.vc.audioController addChannels:@[mandolinChannel]];
     
 //    audioRec = [AEBlockAudioReceiver audioReceiverWithBlock:^(void *source, const AudioTimeStamp *time, UInt32 frames, AudioBufferList *audio) {}];
@@ -109,7 +112,7 @@ float * g_big_bar_heights = NULL;
 //    
 //    [self.vc.audioController addInputReceiver:audioRec];
 //    [self.vc.audioController addOutputReceiver:audioOut];
-    [self.vc.audioController addChannels: @[player]];
+//    [self.vc.audioController addChannels: @[player]];
     
 }
 
@@ -144,6 +147,10 @@ float * g_big_bar_heights = NULL;
 
 -(void) coreSetDimsWithWidth:(CGFloat)w andHeight:(CGFloat)h {
     GLoilerSetDims(w, h);
+}
+
+-(void)unmute{
+    [mandolinChannel setChannelIsMuted:NO];
 }
 
 @end

@@ -9,6 +9,9 @@
 #import "MHViewController.h"
 #import "MHCore.h"
 #import <OpenGLES/ES2/glext.h>
+#import "mo-fun.h"
+
+#define divisions 15.0
 
 @interface MHViewController()
 
@@ -20,10 +23,23 @@
 - (void)tearDownGL;
 @end
 
-@implementation MHViewController
+@implementation MHViewController {
+    float viewHeight;
+    float divHeight;
+    int keyOffset;
+    float lastY;
+    BOOL firstTouchYet;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    viewHeight = [[UIScreen mainScreen] bounds].size.height;
+//    NSLog(@"%f - viewHeight",viewHeight);
+    divHeight = viewHeight / divisions;
+//    NSLog(@"%f - divHeight",divHeight);
+    lastY = 0.0;
+    firstTouchYet = NO;
     
     self.core = [[MHCore alloc] initWithViewController:self];
     
@@ -97,9 +113,55 @@
 }
 
 - (void)yValueReturned:(float)y{
-    NSLog(@"%f",y);
-    self.core.mandolin->setFrequency(y);
+    if(!firstTouchYet) {
+        firstTouchYet = YES;
+        [self.core unmute];
+    }
+    
+//    Major Scale: R, W, W, H, W, W, W, H
+//    Natural Minor Scale: R, W, H, W, W, H, W, W
+    int midi = 48+keyOffset;
+    if (y > (viewHeight-divHeight)) {
+        midi += 0;
+    } else if (y > (viewHeight - divHeight*2)) {
+        midi += 2;
+    } else if (y > (viewHeight - divHeight*3)) {
+        midi += 3;
+    } else if (y > (viewHeight - divHeight*4)) {
+        midi += 5;
+    } else if (y > (viewHeight - divHeight*5)) {
+        midi += 7;
+    } else if (y > (viewHeight - divHeight*6)) {
+        midi += 8;
+    } else if (y > (viewHeight - divHeight*7)) {
+        midi += 10;
+    } else if (y > (viewHeight - divHeight*8)) {
+        midi += 12;
+    } else if (y > (viewHeight - divHeight*9)) {
+        midi += 14;
+    } else if (y > (viewHeight - divHeight*10)) {
+        midi += 15;
+    } else if (y > (viewHeight - divHeight*11)) {
+        midi += 17;
+    } else if (y > (viewHeight - divHeight*12)) {
+        midi += 19;
+    } else if (y > (viewHeight - divHeight*13)) {
+        midi += 20;
+    } else if (y > (viewHeight - divHeight*14)) {
+        midi += 22;
+    } else if (y > (viewHeight - divHeight*15)) {
+        midi += 24;
+    }
+
+    self.core.mandolin->setFrequency(MoFun::midi2freq(midi));
     self.core.mandolin->pluck(1);
+    
+    lastY = y;
+}
+
+- (IBAction)newValue:(id)sender {
+    UIStepper *stepper = (UIStepper *)sender;
+    keyOffset = (int)stepper.value;
 }
 
 @end

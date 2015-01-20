@@ -34,5 +34,6 @@ void GLoilerSetDims( float width, float height );
 -(void) coreInit;
 -(void) coreRender;
 -(void) coreSetDimsWithWidth:(CGFloat)w andHeight:(CGFloat)h;
+-(void) unmute;
 
 @end

@@ -18,5 +18,6 @@
 @property (nonatomic) AEAudioController *audioController;
 
 - (void)yValueReturned:(float)y;
+- (IBAction)newValue:(id)sender;
 
 @end

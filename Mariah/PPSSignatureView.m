@@ -1,8 +1,8 @@
 #import "PPSSignatureView.h"
 #import <OpenGLES/ES2/glext.h>
 
-#define             STROKE_WIDTH_MIN 0.004 // Stroke width determined by touch velocity
-#define             STROKE_WIDTH_MAX 0.030
+#define             STROKE_WIDTH_MIN 0.002 // Stroke width determined by touch velocity
+#define             STROKE_WIDTH_MAX 0.050
 #define       STROKE_WIDTH_SMOOTHING 0.5   // Low pass filter alpha
 
 #define           VELOCITY_CLAMP_MIN 20
