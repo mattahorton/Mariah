@@ -1,0 +1,2 @@
+pod 'TheAmazingAudioEngine'
+pod 'STK'

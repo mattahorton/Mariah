@@ -1,0 +1,13 @@
+PODS:
+  - STK (4.5.2)
+  - TheAmazingAudioEngine (1.4.6)
+
+DEPENDENCIES:
+  - STK
+  - TheAmazingAudioEngine
+
+SPEC CHECKSUMS:
+  STK: b18355d6f4dac95c45a6a0ef8f57a07b5825686f
+  TheAmazingAudioEngine: d4c027506d6b8b025c5947fb401a972ccf7574f3
+
+COCOAPODS: 0.35.0
