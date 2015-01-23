@@ -25,6 +25,7 @@
 
 @implementation MHViewController {
     float viewHeight;
+    float viewWidth;
     float divHeight;
     int keyOffset;
     float lastY;
@@ -35,6 +36,7 @@
     [super viewDidLoad];
     
     viewHeight = [[UIScreen mainScreen] bounds].size.height;
+    viewWidth = [[UIScreen mainScreen] bounds].size.width;
 //    NSLog(@"%f - viewHeight",viewHeight);
     divHeight = viewHeight / divisions;
 //    NSLog(@"%f - divHeight",divHeight);
@@ -112,11 +114,13 @@
 {
 }
 
-- (void)yValueReturned:(float)y{
+- (void)yValueReturned:(float)y withXValue:(float)x{
     if(!firstTouchYet) {
         firstTouchYet = YES;
         [self.core unmute];
     }
+    
+    [self.core setPitShiftFactor:x/viewWidth];
     
 //    Major Scale: R, W, W, H, W, W, W, H
 //    Natural Minor Scale: R, W, H, W, W, H, W, W
@@ -154,9 +158,10 @@
     }
 
     self.core.mandolin->setFrequency(MoFun::midi2freq(midi));
-    self.core.mandolin->pluck(1);
-    
-    lastY = y;
+    if (fabs(y-lastY)>divHeight){
+        self.core.mandolin->pluck(1);
+        lastY = y;
+    }
 }
 
 - (IBAction)newValue:(id)sender {

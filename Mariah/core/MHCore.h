@@ -28,6 +28,7 @@ void GLoilerSetDims( float width, float height );
 @property (nonatomic) MHViewController* vc;
 @property (nonatomic) BOOL fromFile;
 @property (nonatomic) stk::Mandolin *mandolin;
+@property (nonatomic) float pitShiftFactor;
 
 -(instancetype)initWithViewController:(MHViewController *)vc;
 

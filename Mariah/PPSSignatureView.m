@@ -298,7 +298,7 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
     CGPoint l = [p locationInView:self];
     
 //    NSLog(@"%f",l.y);
-    [(MHViewController *)self.viewController yValueReturned:l.y];
+    [(MHViewController *)self.viewController yValueReturned:l.y withXValue:l.x];
     
     currentVelocity = ViewPointToGL(v, self.bounds, (GLKVector3){0,0,0});
     float distance = 0.;

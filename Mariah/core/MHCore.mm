@@ -7,6 +7,8 @@
 //
 
 #import "MHCore.h"
+#import "LentPitShift.h"
+#import "PitShift.h"
 #import "AEBlockAudioReceiver.h"
 #import "AEAudioFilePlayer.h"
 #import "mo-gfx.h"
@@ -47,6 +49,9 @@ float * g_big_bar_heights = NULL;
     AEBlockAudioReceiver *audioOut;
     AEAudioFilePlayer *player;
     AEBlockChannel *mandolinChannel;
+//    stk::LentPitShift *pitShift;
+    stk::PitShift *pitShift;
+    stk::StkFrames buffer;
 }
 
 -(instancetype)initWithViewController:(MHViewController *) viewController {
@@ -78,26 +83,27 @@ float * g_big_bar_heights = NULL;
     
     framesize = AEConvertSecondsToFrames(self.vc.audioController, dur);
     
-    g_vertices = new float[framesize*2]; //2d
-    
-    NSURL *file = [[NSBundle mainBundle] URLForResource:@"Loop" withExtension:@"m4a"];
-    player = [AEAudioFilePlayer audioFilePlayerWithURL:file
-                                          audioController:self.vc.audioController
-                                                    error:NULL];
-    [player setLoop:YES];
-    [player setCurrentTime:0];
-    [player setVolume:0];
-    
     self.mandolin = new stk::Mandolin(100);
     self.mandolin->noteOff(0.0);
+    
+//    pitShift = new stk::LentPitShift(1.0,(int)framesize);
+    pitShift = new stk::PitShift();
+    
+    buffer = stk::StkFrames((int)framesize,1);
     
     mandolinChannel = [AEBlockChannel channelWithBlock:^(const AudioTimeStamp  *time,
                                                            UInt32 frames,
                                                            AudioBufferList *audio) {
+        pitShift->setShift(self.pitShiftFactor);
+        
+        self.mandolin->tick(buffer,0);
+        
+        pitShift->tick(buffer,0);
+        
         for ( int i=0; i<frames; i++ ) {
             
             ((float*)audio->mBuffers[0].mData)[i] =
-            ((float*)audio->mBuffers[1].mData)[i] = self.mandolin->tick();
+            ((float*)audio->mBuffers[1].mData)[i] = buffer[i];
             
         }
     }];
@@ -105,14 +111,6 @@ float * g_big_bar_heights = NULL;
     [mandolinChannel setChannelIsMuted:YES];
     
     [self.vc.audioController addChannels:@[mandolinChannel]];
-    
-//    audioRec = [AEBlockAudioReceiver audioReceiverWithBlock:^(void *source, const AudioTimeStamp *time, UInt32 frames, AudioBufferList *audio) {}];
-//    
-//    audioOut = [AEBlockAudioReceiver audioReceiverWithBlock:^(void *source, const AudioTimeStamp *time, UInt32 frames, AudioBufferList *audio) {}];
-//    
-//    [self.vc.audioController addInputReceiver:audioRec];
-//    [self.vc.audioController addOutputReceiver:audioOut];
-//    [self.vc.audioController addChannels: @[player]];
     
 }
 
