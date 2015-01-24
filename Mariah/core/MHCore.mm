@@ -68,40 +68,44 @@ float * g_buffer = NULL;
     
     framesize = AEConvertSecondsToFrames(self.vc.audioController, dur);
     
-    g_buffer = new float[framesize];
+//    g_buffer = new float[framesize];
+    g_buffer = new float[framesize*2];
     
     audioRec = [AEBlockAudioReceiver audioReceiverWithBlock:^(void *source,
                                                               const AudioTimeStamp *time,
                                                               UInt32 frames, AudioBufferList *audio) {
         for( int i = 0; i < frames; i++ )
         {
-            g_buffer[i] = ((float*)audio->mBuffers[0].mData)[i];
+//            g_buffer[i] = ((float*)audio->mBuffers[0].mData)[i];
+            g_buffer[2*i] = ((float*)audio->mBuffers[0].mData)[i];
+            g_buffer[2*i+1] = ((float*)audio->mBuffers[1].mData)[i];
+            ((float*)audio->mBuffers[1].mData)[i] = 0;
+            ((float*)audio->mBuffers[0].mData)[i] = 0;
         }
-        
-        NSLog(@"%f",self.pitShiftFactor);
     }];
     
     pitShift = new stk::PitShift();
     
-    buffer = stk::StkFrames((int)framesize,1);
+//    buffer = stk::StkFrames((int)framesize,1);
+    buffer = stk::StkFrames((int)framesize,2);
     
     audioOut = [AEBlockChannel channelWithBlock:^(const AudioTimeStamp  *time,
                                                            UInt32 frames,
                                                            AudioBufferList *audio) {
         
-        for (int i = 0; i < framesize; i++){
+        for (int i = 0; i < framesize*2; i++){
             buffer[i] = g_buffer[i];
         }
         
         pitShift->setShift(self.pitShiftFactor);
         
-        pitShift->tick(buffer,0);
+//        pitShift->tick(buffer,0);
+//        pitShift->tick(buffer,1);
         
         for ( int i=0; i<frames; i++ ) {
-            
-            ((float*)audio->mBuffers[0].mData)[i] =
-            ((float*)audio->mBuffers[1].mData)[i] = buffer[i];
-            
+            //NSLog(@"%f",buffer[2*i]);
+            ((float*)audio->mBuffers[0].mData)[i] = pitShift->tick(buffer[2*i]);
+            ((float*)audio->mBuffers[1].mData)[i] = pitShift->tick(buffer[2*i+1]);
         }
     }];
     

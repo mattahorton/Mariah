@@ -1,2 +1,2 @@
 pod 'TheAmazingAudioEngine'
-pod 'STK'
+pod 'STK', :git => 'https://github.com/mattahorton/stk.git'

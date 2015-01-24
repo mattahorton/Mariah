@@ -3,8 +3,17 @@ PODS:
   - TheAmazingAudioEngine (1.4.6)
 
 DEPENDENCIES:
-  - STK
+  - STK (from `https://github.com/mattahorton/stk.git`)
   - TheAmazingAudioEngine
+
+EXTERNAL SOURCES:
+  STK:
+    :git: https://github.com/mattahorton/stk.git
+
+CHECKOUT OPTIONS:
+  STK:
+    :commit: 1f87d8cada31480f6e753c2a81a32ae0fff10475
+    :git: https://github.com/mattahorton/stk.git
 
 SPEC CHECKSUMS:
   STK: b18355d6f4dac95c45a6a0ef8f57a07b5825686f

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C94b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="eVI-v4-a52">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C106a" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="eVI-v4-a52">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
@@ -16,22 +16,6 @@
                     <glkView key="view" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" enableSetNeedsDisplay="NO" id="HTU-LT-YDU" customClass="PPSSignatureView">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minimumValue="1" maximumValue="12" translatesAutoresizingMaskIntoConstraints="NO" id="iuK-Br-6xw">
-                                <rect key="frame" x="253" y="514" width="94" height="29"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="29" id="6DG-U7-QHZ"/>
-                                    <constraint firstAttribute="width" constant="94" id="7ij-xh-ize"/>
-                                </constraints>
-                                <connections>
-                                    <action selector="newValue:" destination="eVI-v4-a52" eventType="valueChanged" id="VH3-TU-OZc"/>
-                                </connections>
-                            </stepper>
-                        </subviews>
-                        <constraints>
-                            <constraint firstAttribute="centerX" secondItem="iuK-Br-6xw" secondAttribute="centerX" id="RdI-tu-O1J"/>
-                            <constraint firstItem="PDa-ls-TPd" firstAttribute="top" secondItem="iuK-Br-6xw" secondAttribute="bottom" constant="57" id="ip2-xB-8wh"/>
-                        </constraints>
                         <connections>
                             <outlet property="delegate" destination="eVI-v4-a52" id="6px-VA-2er"/>
                         </connections>
