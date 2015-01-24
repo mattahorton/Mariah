@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "MHViewController.h"
-#import "Mandolin.h"
 
 #ifndef __GLoiler__renderer__
 #define __GLoiler__renderer__
@@ -27,7 +26,6 @@ void GLoilerSetDims( float width, float height );
 
 @property (nonatomic) MHViewController* vc;
 @property (nonatomic) BOOL fromFile;
-@property (nonatomic) stk::Mandolin *mandolin;
 @property (nonatomic) float pitShiftFactor;
 
 -(instancetype)initWithViewController:(MHViewController *)vc;

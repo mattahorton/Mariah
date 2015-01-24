@@ -28,28 +28,13 @@ GLfloat g_gfxHeight = 568;
 GLint g_numBigBars = 20;
 
 // buffer
-float * g_vertices = NULL;
-UInt32 g_numFrames;
 float * g_buffer = NULL;
-float * g_freq_buffer = NULL;
-complex * g_cbuff = NULL;
-// window
-float * g_window = NULL;
-float * g_spectrum = NULL;
-float * g_bars = NULL;
-float * g_big_bars = NULL;
-GLshort * g_specIndeces = NULL;
-GLshort * g_bigIndeces = NULL;
-float * g_big_bar_heights = NULL;
 
 
 @implementation MHCore {
     long framesize;
     AEBlockAudioReceiver *audioRec;
-    AEBlockAudioReceiver *audioOut;
-    AEAudioFilePlayer *player;
-    AEBlockChannel *mandolinChannel;
-//    stk::LentPitShift *pitShift;
+    AEBlockChannel *audioOut;
     stk::PitShift *pitShift;
     stk::StkFrames buffer;
 }
@@ -83,20 +68,32 @@ float * g_big_bar_heights = NULL;
     
     framesize = AEConvertSecondsToFrames(self.vc.audioController, dur);
     
-    self.mandolin = new stk::Mandolin(100);
-    self.mandolin->noteOff(0.0);
+    g_buffer = new float[framesize];
     
-//    pitShift = new stk::LentPitShift(1.0,(int)framesize);
+    audioRec = [AEBlockAudioReceiver audioReceiverWithBlock:^(void *source,
+                                                              const AudioTimeStamp *time,
+                                                              UInt32 frames, AudioBufferList *audio) {
+        for( int i = 0; i < frames; i++ )
+        {
+            g_buffer[i] = ((float*)audio->mBuffers[0].mData)[i];
+        }
+        
+        NSLog(@"%f",self.pitShiftFactor);
+    }];
+    
     pitShift = new stk::PitShift();
     
     buffer = stk::StkFrames((int)framesize,1);
     
-    mandolinChannel = [AEBlockChannel channelWithBlock:^(const AudioTimeStamp  *time,
+    audioOut = [AEBlockChannel channelWithBlock:^(const AudioTimeStamp  *time,
                                                            UInt32 frames,
                                                            AudioBufferList *audio) {
-        pitShift->setShift(self.pitShiftFactor);
         
-        self.mandolin->tick(buffer,0);
+        for (int i = 0; i < framesize; i++){
+            buffer[i] = g_buffer[i];
+        }
+        
+        pitShift->setShift(self.pitShiftFactor);
         
         pitShift->tick(buffer,0);
         
@@ -108,9 +105,9 @@ float * g_big_bar_heights = NULL;
         }
     }];
     
-    [mandolinChannel setChannelIsMuted:YES];
-    
-    [self.vc.audioController addChannels:@[mandolinChannel]];
+    [audioOut setChannelIsMuted:YES];
+    [self.vc.audioController addInputReceiver:audioRec];
+    [self.vc.audioController addChannels:@[audioOut]];
     
 }
 
@@ -148,7 +145,7 @@ float * g_big_bar_heights = NULL;
 }
 
 -(void)unmute{
-    [mandolinChannel setChannelIsMuted:NO];
+    [audioOut setChannelIsMuted:NO];
 }
 
 @end

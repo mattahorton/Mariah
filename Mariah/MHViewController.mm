@@ -10,6 +10,7 @@
 #import "MHCore.h"
 #import <OpenGLES/ES2/glext.h>
 #import "mo-fun.h"
+#import <math.h>
 
 #define divisions 15.0
 
@@ -30,6 +31,7 @@
     int keyOffset;
     float lastY;
     BOOL firstTouchYet;
+    double ratio;
 }
 
 - (void)viewDidLoad {
@@ -42,6 +44,8 @@
 //    NSLog(@"%f - divHeight",divHeight);
     lastY = 0.0;
     firstTouchYet = NO;
+    
+    ratio = 0.0;
     
     self.core = [[MHCore alloc] initWithViewController:self];
     
@@ -120,48 +124,58 @@
         [self.core unmute];
     }
     
-    [self.core setPitShiftFactor:x/viewWidth];
-    
 //    Major Scale: R, W, W, H, W, W, W, H
 //    Natural Minor Scale: R, W, H, W, W, H, W, W
     int midi = 48+keyOffset;
     if (y > (viewHeight-divHeight)) {
         midi += 0;
+        ratio = pow(2.0,-24.0/12.0);
     } else if (y > (viewHeight - divHeight*2)) {
         midi += 2;
+        ratio = pow(2.0,-22.0/12.0);
     } else if (y > (viewHeight - divHeight*3)) {
         midi += 3;
+        ratio = pow(2.0,-21.0/12.0);
     } else if (y > (viewHeight - divHeight*4)) {
         midi += 5;
+        ratio = pow(2.0,-19.0/12.0);
     } else if (y > (viewHeight - divHeight*5)) {
         midi += 7;
+        ratio = pow(2.0,-17.0/12.0);
     } else if (y > (viewHeight - divHeight*6)) {
         midi += 8;
+        ratio = pow(2.0,-16.0/12.0);
     } else if (y > (viewHeight - divHeight*7)) {
         midi += 10;
+        ratio = pow(2.0,-14.0/12.0);
     } else if (y > (viewHeight - divHeight*8)) {
         midi += 12;
+        ratio = pow(2.0,-12.0/12.0);
     } else if (y > (viewHeight - divHeight*9)) {
         midi += 14;
+        ratio = pow(2.0,-10.0/12.0);
     } else if (y > (viewHeight - divHeight*10)) {
         midi += 15;
+        ratio = pow(2.0,-9.0/12.0);
     } else if (y > (viewHeight - divHeight*11)) {
         midi += 17;
+        ratio = pow(2.0,-7.0/12.0);
     } else if (y > (viewHeight - divHeight*12)) {
         midi += 19;
+        ratio = pow(2.0,-5.0/12.0);
     } else if (y > (viewHeight - divHeight*13)) {
         midi += 20;
+        ratio = pow(2.0,-4.0/12.0);
     } else if (y > (viewHeight - divHeight*14)) {
         midi += 22;
+        ratio = pow(2.0,-2.0/12.0);
     } else if (y > (viewHeight - divHeight*15)) {
         midi += 24;
+        ratio = pow(2.0,0.0/12.0);
     }
-
-    self.core.mandolin->setFrequency(MoFun::midi2freq(midi));
-    if (fabs(y-lastY)>divHeight){
-        self.core.mandolin->pluck(1);
-        lastY = y;
-    }
+    
+    
+    [self.core setPitShiftFactor:ratio];
 }
 
 - (IBAction)newValue:(id)sender {
