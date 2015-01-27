@@ -29,6 +29,7 @@ void GLoilerSetDims( float width, float height );
 @property (nonatomic) BOOL fromFile;
 @property (nonatomic) float pitShiftFactor;
 @property (nonatomic) AERecorder * recorder;
+@property (nonatomic) BOOL hasPlayedOnce;
 
 -(instancetype)initWithViewController:(MHViewController *)vc;
 

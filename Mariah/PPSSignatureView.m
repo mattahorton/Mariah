@@ -310,7 +310,10 @@ static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
 
 
 - (void)longPress:(UILongPressGestureRecognizer *)lp {
-    [(MHViewController*)self.viewController playback];
+    
+    if ([lp state] == UIGestureRecognizerStateBegan) {
+        [(MHViewController*)self.viewController playback];
+    }
 }
 
 - (void)pan:(UIPanGestureRecognizer *)p {

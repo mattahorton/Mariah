@@ -35,6 +35,9 @@ float * g_buffer = NULL;
     AEAudioFilePlayer *filePlayer;
     stk::PitShift *pitShift;
     stk::StkFrames buffer;
+    NSString *documentsFolder;
+    NSString *filePath;
+    NSURL *file;
 }
 
 -(instancetype)initWithViewController:(MHViewController *) viewController {
@@ -111,6 +114,8 @@ float * g_buffer = NULL;
     [self.vc.audioController addInputReceiver:audioRec];
     [self.vc.audioController addChannels:@[audioOut]];
     
+    self.hasPlayedOnce = NO;
+    
 }
 
 -(void) coreRender {
@@ -159,9 +164,9 @@ float * g_buffer = NULL;
 - (void)beginRecording {
     // Init recorder
     self.recorder = [[AERecorder alloc] initWithAudioController:self.vc.audioController];
-    NSString *documentsFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)
+    documentsFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)
                                  objectAtIndex:0];
-    NSString *filePath = [documentsFolder stringByAppendingPathComponent:@"Recording.aiff"];
+    filePath = [documentsFolder stringByAppendingPathComponent:@"Recording.aiff"];
     // Start the recording process
     NSError *error = NULL;
     if ( ![_recorder beginRecordingToFileAtPath:filePath
@@ -170,37 +175,52 @@ float * g_buffer = NULL;
         // Report error
         return;
     }
-    // Receive both audio input and audio output. Note that if you're using
-    // AEPlaythroughChannel, mentioned above, you may not need to receive the input again.
-//    [self.vc.audioController addInputReceiver:_recorder];
+    
     [self.vc.audioController addOutputReceiver:_recorder];
+    
+    if (filePlayer)[self.vc.audioController removeChannels:@[filePlayer]];
+    filePlayer = nil;
 }
 
 - (void)endRecording {
-//    [_audioController removeInputReceiver:_recorder];
-    [self.vc.audioController removeOutputReceiver:_recorder];
     [_recorder finishRecording];
+    [self.vc.audioController removeOutputReceiver:_recorder];
     self.recorder = nil;
+    
+    self.hasPlayedOnce = NO;
 }
 
 -(void)playback{
-    // GIVE ME A COMPLETION BLOCK
-    NSString *documentsFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)
-                                 objectAtIndex:0];
-    NSString *filePath = [documentsFolder stringByAppendingPathComponent:@"Recording.aiff"];
-    NSURL *file = [NSURL URLWithString:filePath];
-    filePlayer = [AEAudioFilePlayer audioFilePlayerWithURL:file audioController:self.vc.audioController error:NULL];
-//    [filePlayer setChannelIsMuted:YES];
-    [filePlayer setChannelIsPlaying:NO];
-    [filePlayer setLoop:NO];
     
-    if(filePlayer && !filePlayer.channelIsPlaying){
+    if (self.hasPlayedOnce) {
+        [self.vc.audioController removeChannels:@[filePlayer]];
+        filePlayer = nil;
+        documentsFolder = nil;
+        filePath = nil;
+        file = nil;
+    }
+    
+    documentsFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)
+                                 objectAtIndex:0];
+    filePath = [documentsFolder stringByAppendingPathComponent:@"Recording.aiff"];
+    file = [NSURL URLWithString:filePath];
 
-        [filePlayer setCurrentTime:0];
-        [filePlayer setChannelIsPlaying:YES];
-        [filePlayer setChannelIsMuted:NO];
-        
+    filePlayer = [AEAudioFilePlayer audioFilePlayerWithURL:file audioController:self.vc.audioController error:NULL];
+    [filePlayer setLoop:NO];
+    [filePlayer setChannelIsMuted:YES];
+    [filePlayer setChannelIsPlaying:NO];
+    
+    MHCore * __weak weakSelf = self;
+    filePlayer.completionBlock = ^void(){
+        weakSelf.hasPlayedOnce = YES;
+    };
+
+    
+    if(filePlayer && filePlayer.channelIsMuted){
         [self.vc.audioController addChannels:@[filePlayer]];
+        [filePlayer setCurrentTime:0];
+        [filePlayer setChannelIsMuted:NO];
+        [filePlayer setChannelIsPlaying:YES];
     }
 }
 
