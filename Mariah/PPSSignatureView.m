@@ -1,5 +1,6 @@
 #import "PPSSignatureView.h"
 #import <OpenGLES/ES2/glext.h>
+#import <math.h>
 
 #define             STROKE_WIDTH_MIN 0.002 // Stroke width determined by touch velocity
 #define             STROKE_WIDTH_MAX 0.050
@@ -27,8 +28,8 @@
 @end
 
 
-static GLKVector3 StrokeColor = { 195.0/256.0,194.0/256.0,27.0/256.0 };
-static float clearColor[4] = { 104.0/256.0, 91.0/256.0, 224.0/256.0, 1 };
+static GLKVector3 StrokeColor = { 195.0/255.0,194.0/255.0,27.0/255.0 };
+static float clearColor[4] = { 104.0/255.0, 91.0/255.0, 225.0/255.0, 1 };
 
 // Vertex structure containing 3D point and color
 struct PPSSignaturePoint
@@ -44,11 +45,13 @@ static const int maxLength = MAXIMUM_VERTECES;
 
 
 // Append vertex to array buffer
-static inline void addVertex(uint *length, PPSSignaturePoint v) {
+static inline void addVertex(uint *length, PPSSignaturePoint v, NSMutableArray *arrayToAddTo, CGPoint p) {
     if ((*length) >= maxLength) {
         return;
     }
     
+//    [arrayToAddTo addObject:@{@"x":[NSNumber numberWithFloat:p.x],@"y":[NSNumber numberWithFloat:p.y]}];
+
     GLvoid *data = glMapBufferOES(GL_ARRAY_BUFFER, GL_WRITE_ONLY_OES);
     memcpy(data + sizeof(PPSSignaturePoint) * (*length), &v, sizeof(PPSSignaturePoint));
     glUnmapBufferOES(GL_ARRAY_BUFFER);
@@ -92,6 +95,14 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
     };
 }
 
+static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
+    
+    return (CGPoint) {
+        ((point.vertex.x + 1)*bounds.size.width/2.0),
+        fabs((point.vertex.y + 1)*bounds.size.height/ 2.0 )
+    };
+}
+
 
 @interface PPSSignatureView () {
     // OpenGL state
@@ -103,6 +114,7 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
     GLuint dotsArray;
     GLuint dotsBuffer;
     
+    UIColor * strokeUIColor;
     
     // Array of verteces, with current length
     PPSSignaturePoint SignatureVertexData[maxLength];
@@ -122,6 +134,8 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
     CGPoint previousMidPoint;
     PPSSignaturePoint previousVertex;
     PPSSignaturePoint currentVelocity;
+    
+    NSMutableArray * currentLine;
 }
 
 @end
@@ -163,6 +177,8 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
         UILongPressGestureRecognizer *longer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPress:)];
         longer.cancelsTouchesInView = YES;
         [self addGestureRecognizer:longer];
+        
+        currentLine = [[NSMutableArray alloc] init];
         
     } else [NSException raise:@"NSOpenGLES2ContextException" format:@"Failed to create OpenGL ES2 context"];
 }
@@ -228,15 +244,15 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
     if (!self.hasSignature)
         return nil;
     
-    //    self.hidden = YES;
-    //
-    //    self.strokeColor = [UIColor whiteColor];
-    //    [self setNeedsDisplay];
+//    self.hidden = YES;
+//    self.strokeColor = [UIColor whiteColor];
+//    [self setNeedsDisplay];
+//    
     UIImage *screenshot = [self snapshot];
     
-    //    self.strokeColor = nil;
-    //
-    //    self.hidden = NO;
+//    self.strokeColor = [UIColor colorWithRed:StrokeColor.r green:StrokeColor.g blue:StrokeColor.b alpha:1];
+//    self.hidden = NO;
+    
     return screenshot;
 }
 
@@ -251,11 +267,11 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
         glBindBuffer(GL_ARRAY_BUFFER, dotsBuffer);
         
         PPSSignaturePoint touchPoint = ViewPointToGL(l, self.bounds, (GLKVector3){1, 1, 1});
-        addVertex(&dotsLength, touchPoint);
+        addVertex(&dotsLength, touchPoint,currentLine,l);
         
         PPSSignaturePoint centerPoint = touchPoint;
         centerPoint.color = StrokeColor;
-        addVertex(&dotsLength, centerPoint);
+        addVertex(&dotsLength, centerPoint,currentLine,l);
         
         static int segments = 20;
         GLKVector2 radius = (GLKVector2){
@@ -271,13 +287,13 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
             p.vertex.x += velocityRadius.x * cosf(angle);
             p.vertex.y += velocityRadius.y * sinf(angle);
             
-            addVertex(&dotsLength, p);
-            addVertex(&dotsLength, centerPoint);
+            addVertex(&dotsLength, p,currentLine,GLToViewPoint(p,self.bounds));
+            addVertex(&dotsLength, centerPoint,currentLine,GLToViewPoint(p,self.bounds));
             
             angle += M_PI * 2.0 / segments;
         }
         
-        addVertex(&dotsLength, touchPoint);
+        addVertex(&dotsLength, touchPoint,currentLine,l);
         
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -323,8 +339,8 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
         previousVertex = startPoint;
         previousThickness = penThickness;
         
-        addVertex(&length, startPoint);
-        addVertex(&length, previousVertex);
+        addVertex(&length, startPoint,currentLine,l);
+        addVertex(&length, previousVertex,currentLine,l);
         
         self.hasSignature = YES;
         
@@ -368,10 +384,10 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
     } else if (p.state == UIGestureRecognizerStateEnded | p.state == UIGestureRecognizerStateCancelled) {
         
         PPSSignaturePoint v = ViewPointToGL(l, self.bounds, (GLKVector3){1, 1, 1});
-        addVertex(&length, v);
+        addVertex(&length, v,currentLine,l);
         
         previousVertex = v;
-        addVertex(&length, previousVertex);
+        addVertex(&length, previousVertex,currentLine,l);
     }
     
     [self setNeedsDisplay];
@@ -380,7 +396,7 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
 
 - (void)setStrokeColor:(UIColor *)strokeColor {
     _strokeColor = strokeColor;
-    NSLog(@"%@",strokeColor);
+//    NSLog(@"%@",strokeColor);
     [self updateStrokeColor];
 }
 
@@ -425,7 +441,9 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
     
     effect = [[GLKBaseEffect alloc] init];
     
-    [self setStrokeColor:[[UIColor alloc] initWithRed:StrokeColor.r green:StrokeColor.g blue:StrokeColor.b alpha:1.0]];
+    strokeUIColor = [[UIColor alloc] initWithRed:StrokeColor.r green:StrokeColor.g blue:StrokeColor.b alpha:1.0];
+    
+    [self setStrokeColor:strokeUIColor];
     
     
     glDisable(GL_DEPTH_TEST);
@@ -487,7 +505,7 @@ static PPSSignaturePoint ViewPointToGL(CGPoint viewPoint, CGRect bounds, GLKVect
             { p1.x + difX, p1.y + difY, 0.0 },
             StrokeColor
         };
-        addVertex(&length, stripPoint);
+        addVertex(&length, stripPoint,currentLine,GLToViewPoint(stripPoint,self.bounds));
         
         toTravel *= -1;
     }

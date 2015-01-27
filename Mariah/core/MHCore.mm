@@ -21,11 +21,8 @@
 
 
 // global variables
-GLfloat g_waveformWidth = 300;
-GLfloat g_waveformHeight = 420;
 GLfloat g_gfxWidth = 320;
 GLfloat g_gfxHeight = 568;
-GLint g_numBigBars = 20;
 
 // buffer
 float * g_buffer = NULL;

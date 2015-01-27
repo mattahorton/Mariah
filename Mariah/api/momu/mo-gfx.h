@@ -58,6 +58,8 @@
 #include <string.h>
 #include <sys/time.h>
 #include <OpenGLES/ES1/gl.h>
+#include <Foundation/Foundation.h>
+#include <UIKit/UIKit.h>
 
 
 
@@ -346,10 +348,10 @@ public: // GLU-like stuff
                         double up_x, double up_y, double up_z );
     
     // load texture (call this with a texture bound)
-    // static bool loadTexture( NSString * name, NSString * ext );
+     static bool loadTexture( NSString * name, NSString * ext );
 
     // load texture from a UIImage
-    // static bool loadTexture( UIImage * image );
+     static bool loadTexture( UIImage * image );
     
     // point in triangle test (2D)
     static bool isPointInTriangle2D( const Vector3D & pt, const Vector3D & a, 

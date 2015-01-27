@@ -33,6 +33,8 @@
 		B9A5CC971A6B286000CC50A3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86C89C9A1A688DAD00799680 /* LaunchScreen.xib */; };
 		B9A5CC991A6B2B4700CC50A3 /* Loop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B9A5CC981A6B2B4700CC50A3 /* Loop.m4a */; };
 		B9B80B5E1A690B8300A08B9B /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = B9B80B5D1A690B8300A08B9B /* Podfile */; };
+		B9BC8E251A762A6600D37280 /* sun1.png in Resources */ = {isa = PBXBuildFile; fileRef = B9BC8E241A762A6600D37280 /* sun1.png */; };
+		B9E353C31A7618560082476B /* MHTexture.mm in Sources */ = {isa = PBXBuildFile; fileRef = B9E353C21A7618560082476B /* MHTexture.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +95,9 @@
 		B99CDA401A69F32E003CAAA5 /* mo-audio.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "mo-audio.mm"; path = "Mariah/api/momu/mo-audio.mm"; sourceTree = SOURCE_ROOT; };
 		B9A5CC981A6B2B4700CC50A3 /* Loop.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = Loop.m4a; path = Mariah/Loop.m4a; sourceTree = "<group>"; };
 		B9B80B5D1A690B8300A08B9B /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		B9BC8E241A762A6600D37280 /* sun1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sun1.png; sourceTree = "<group>"; };
+		B9E353C11A7618560082476B /* MHTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MHTexture.h; sourceTree = "<group>"; };
+		B9E353C21A7618560082476B /* MHTexture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MHTexture.mm; sourceTree = "<group>"; };
 		BF7AEC140F5D9CD117BD9E64 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		F4F75F7A8A3C2513260C82B2 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -170,6 +175,7 @@
 		86C89C8B1A688DAD00799680 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				B9BC8E241A762A6600D37280 /* sun1.png */,
 				86C89C8C1A688DAD00799680 /* Info.plist */,
 				86C89C8D1A688DAD00799680 /* main.m */,
 			);
@@ -231,6 +237,8 @@
 			children = (
 				B945CB391A6A0AE200091DC3 /* MHCore.h */,
 				B945CB3A1A6A0AE200091DC3 /* MHCore.mm */,
+				B9E353C11A7618560082476B /* MHTexture.h */,
+				B9E353C21A7618560082476B /* MHTexture.mm */,
 			);
 			name = core;
 			path = Mariah/core;
@@ -343,6 +351,7 @@
 			files = (
 				B9A5CC961A6B286000CC50A3 /* Main.storyboard in Resources */,
 				B9A5CC971A6B286000CC50A3 /* LaunchScreen.xib in Resources */,
+				B9BC8E251A762A6600D37280 /* sun1.png in Resources */,
 				B9B80B5E1A690B8300A08B9B /* Podfile in Resources */,
 				86C89C991A688DAD00799680 /* Images.xcassets in Resources */,
 				B9A5CC991A6B2B4700CC50A3 /* Loop.m4a in Resources */,
@@ -408,6 +417,7 @@
 				86C89C941A688DAD00799680 /* ViewController.mm in Sources */,
 				B9138AD81A6DB9E2009BFC86 /* MHViewController.mm in Sources */,
 				86C89C911A688DAD00799680 /* AppDelegate.mm in Sources */,
+				B9E353C31A7618560082476B /* MHTexture.mm in Sources */,
 				86C89C8E1A688DAD00799680 /* main.m in Sources */,
 				86C89D011A689A5000799680 /* DismissSegue.mm in Sources */,
 				86C89CB21A688E9900799680 /* SpecVizViewController.mm in Sources */,

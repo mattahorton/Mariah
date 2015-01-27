@@ -475,28 +475,25 @@ void MoGfx::lookAt( double eye_x, double eye_y, double eye_z,
 // desc: loads an OpenGL ES texture
 //       (from jshmrsn, macrumors forum)
 //-----------------------------------------------------------------------------
-//bool MoGfx::loadTexture( NSString * name, NSString * ext )
-//{
-//    // load the resource
-//    NSString *path = [[NSBundle mainBundle] pathForResource:name ofType:ext];
-//    UIImage *image = [[UIImage alloc] initWithContentsOfFile:path];
-//    if (image == nil)
-//    {
-//        NSLog( @"[mo_gfx]: cannot load file: %@.%@", name, ext );
-//        return FALSE;
-//    }
-//    
-//    // log
-//    NSLog( @"loading texture: %@.%@...", name, ext );
-//
-//    // load image
-//    loadTexture( image );
-//
-//    // cleanup
-//    [image release];
-//
-//    return true;
-//}
+bool MoGfx::loadTexture( NSString * name, NSString * ext )
+{
+    // load the resource
+    NSString *path = [[NSBundle mainBundle] pathForResource:name ofType:ext];
+    UIImage *image = [[UIImage alloc] initWithContentsOfFile:path];
+    if (image == nil)
+    {
+        NSLog( @"[mo_gfx]: cannot load file: %@.%@", name, ext );
+        return FALSE;
+    }
+    
+    // log
+    NSLog( @"loading texture: %@.%@...", name, ext );
+
+    // load image
+    loadTexture( image );
+
+    return true;
+}
 
 
 //-----------------------------------------------------------------------------
@@ -504,37 +501,37 @@ void MoGfx::lookAt( double eye_x, double eye_y, double eye_z,
 // desc: loads an OpenGL ES texture
 //       (from jshmrsn, macrumors forum)
 //-----------------------------------------------------------------------------
-//bool MoGfx::loadTexture( UIImage * image )
-//{
-//    if (image == nil)
-//    {
-//        NSLog( @"[mo_gfx]: error: UIImage == nil..." );
-//        return FALSE;
-//    }
-//    
-//    // convert to RGBA
-//    GLuint width = CGImageGetWidth( image.CGImage );
-//    GLuint height = CGImageGetHeight( image.CGImage );
-//    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-//    void *imageData = malloc( height * width * 4 );
-//    CGContextRef context = CGBitmapContextCreate( 
-//        imageData, width, height, 8, 4 * width, colorSpace, 
-//        kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big );
-//    CGColorSpaceRelease( colorSpace );
-//    CGContextClearRect( context, CGRectMake( 0, 0, width, height ) );
-//    CGContextTranslateCTM( context, 0, height - height );
-//    CGContextDrawImage( context, CGRectMake( 0, 0, width, height ), image.CGImage );
-//    
-//    // load the texture
-//    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, 
-//                  GL_RGBA, GL_UNSIGNED_BYTE, imageData );
-//    
-//    // free resource - OpenGL keeps image internally
-//    CGContextRelease(context);
-//    free(imageData);
-//    
-//    return true;
-//}
+bool MoGfx::loadTexture( UIImage * image )
+{
+    if (image == nil)
+    {
+        NSLog( @"[mo_gfx]: error: UIImage == nil..." );
+        return FALSE;
+    }
+    
+    // convert to RGBA
+    GLuint width = CGImageGetWidth( image.CGImage );
+    GLuint height = CGImageGetHeight( image.CGImage );
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    void *imageData = malloc( height * width * 4 );
+    CGContextRef context = CGBitmapContextCreate( 
+        imageData, width, height, 8, 4 * width, colorSpace, 
+        kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big );
+    CGColorSpaceRelease( colorSpace );
+    CGContextClearRect( context, CGRectMake( 0, 0, width, height ) );
+    CGContextTranslateCTM( context, 0, height - height );
+    CGContextDrawImage( context, CGRectMake( 0, 0, width, height ), image.CGImage );
+    
+    // load the texture
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, 
+                  GL_RGBA, GL_UNSIGNED_BYTE, imageData );
+    
+    // free resource - OpenGL keeps image internally
+    CGContextRelease(context);
+    free(imageData);
+    
+    return true;
+}
 
 
 
