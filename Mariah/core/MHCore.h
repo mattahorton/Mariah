@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "MHViewController.h"
+#import "AERecorder.h"
 
 #ifndef __GLoiler__renderer__
 #define __GLoiler__renderer__
@@ -27,6 +28,7 @@ void GLoilerSetDims( float width, float height );
 @property (nonatomic) MHViewController* vc;
 @property (nonatomic) BOOL fromFile;
 @property (nonatomic) float pitShiftFactor;
+@property (nonatomic) AERecorder * recorder;
 
 -(instancetype)initWithViewController:(MHViewController *)vc;
 
@@ -34,5 +36,9 @@ void GLoilerSetDims( float width, float height );
 -(void) coreRender;
 -(void) coreSetDimsWithWidth:(CGFloat)w andHeight:(CGFloat)h;
 -(void) unmute;
+-(void) mute;
+-(void) beginRecording;
+-(void) endRecording;
+-(void) playback;
 
 @end

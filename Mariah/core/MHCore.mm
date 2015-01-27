@@ -32,6 +32,7 @@ float * g_buffer = NULL;
     long framesize;
     AEBlockAudioReceiver *audioRec;
     AEBlockChannel *audioOut;
+    AEAudioFilePlayer *filePlayer;
     stk::PitShift *pitShift;
     stk::StkFrames buffer;
 }
@@ -147,6 +148,60 @@ float * g_buffer = NULL;
 
 -(void)unmute{
     [audioOut setChannelIsMuted:NO];
+    [self beginRecording];
+}
+
+-(void)mute{
+    [audioOut setChannelIsMuted:YES];
+    [self endRecording];
+}
+
+- (void)beginRecording {
+    // Init recorder
+    self.recorder = [[AERecorder alloc] initWithAudioController:self.vc.audioController];
+    NSString *documentsFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)
+                                 objectAtIndex:0];
+    NSString *filePath = [documentsFolder stringByAppendingPathComponent:@"Recording.aiff"];
+    // Start the recording process
+    NSError *error = NULL;
+    if ( ![_recorder beginRecordingToFileAtPath:filePath
+                                       fileType:kAudioFileAIFFType
+                                          error:&error] ) {
+        // Report error
+        return;
+    }
+    // Receive both audio input and audio output. Note that if you're using
+    // AEPlaythroughChannel, mentioned above, you may not need to receive the input again.
+//    [self.vc.audioController addInputReceiver:_recorder];
+    [self.vc.audioController addOutputReceiver:_recorder];
+}
+
+- (void)endRecording {
+//    [_audioController removeInputReceiver:_recorder];
+    [self.vc.audioController removeOutputReceiver:_recorder];
+    [_recorder finishRecording];
+    self.recorder = nil;
+}
+
+-(void)playback{
+    // GIVE ME A COMPLETION BLOCK
+    NSString *documentsFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)
+                                 objectAtIndex:0];
+    NSString *filePath = [documentsFolder stringByAppendingPathComponent:@"Recording.aiff"];
+    NSURL *file = [NSURL URLWithString:filePath];
+    filePlayer = [AEAudioFilePlayer audioFilePlayerWithURL:file audioController:self.vc.audioController error:NULL];
+//    [filePlayer setChannelIsMuted:YES];
+    [filePlayer setChannelIsPlaying:NO];
+    [filePlayer setLoop:NO];
+    
+    if(filePlayer && !filePlayer.channelIsPlaying){
+
+        [filePlayer setCurrentTime:0];
+        [filePlayer setChannelIsPlaying:YES];
+        [filePlayer setChannelIsMuted:NO];
+        
+        [self.vc.audioController addChannels:@[filePlayer]];
+    }
 }
 
 @end

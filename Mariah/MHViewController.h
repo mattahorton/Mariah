@@ -18,5 +18,8 @@
 @property (nonatomic) AEAudioController *audioController;
 
 - (void)yValueReturned:(float)y withXValue:(float)x;
+-(void)playback;
+-(void)lineStarted;
+-(void)lineEnded;
 
 @end

@@ -136,6 +136,7 @@ static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
     PPSSignaturePoint currentVelocity;
     
     NSMutableArray * currentLine;
+    BOOL lineDrawn;
 }
 
 @end
@@ -151,7 +152,7 @@ static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
         time(NULL);
         
         self.backgroundColor = [UIColor colorWithRed:clearColor[0] green:clearColor[1] blue:clearColor[2] alpha:clearColor[3]];
-        self.opaque = NO;
+        self.opaque = YES;
         
         self.context = context;
         self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
@@ -161,6 +162,8 @@ static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
         self.drawableMultisample = GLKViewDrawableMultisample4X;
         
         [self setupGL];
+        
+        lineDrawn = NO;
         
         // Capture touches
         UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
@@ -261,6 +264,8 @@ static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
 
 
 - (void)tap:(UITapGestureRecognizer *)t {
+    [self erase];
+    
     CGPoint l = [t locationInView:self];
     
     if (t.state == UIGestureRecognizerStateRecognized) {
@@ -296,6 +301,8 @@ static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
         addVertex(&dotsLength, touchPoint,currentLine,l);
         
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+        
+        self.hasSignature = YES;
     }
     
     [self setNeedsDisplay];
@@ -303,7 +310,7 @@ static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
 
 
 - (void)longPress:(UILongPressGestureRecognizer *)lp {
-    [self erase];
+    [(MHViewController*)self.viewController playback];
 }
 
 - (void)pan:(UIPanGestureRecognizer *)p {
@@ -313,7 +320,6 @@ static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
     CGPoint v = [p velocityInView:self];
     CGPoint l = [p locationInView:self];
     
-//    NSLog(@"%f",l.y);
     [(MHViewController *)self.viewController yValueReturned:l.y withXValue:l.x];
     
     currentVelocity = ViewPointToGL(v, self.bounds, (GLKVector3){0,0,0});
@@ -331,6 +337,9 @@ static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
     penThickness = penThickness * lowPassFilterAlpha + newThickness * (1 - lowPassFilterAlpha);
     
     if ([p state] == UIGestureRecognizerStateBegan) {
+        if(self.hasSignature) [self erase];
+        
+        [(MHViewController*)self.viewController lineStarted];
         
         previousPoint = l;
         previousMidPoint = l;
@@ -388,6 +397,7 @@ static CGPoint GLToViewPoint(PPSSignaturePoint point, CGRect bounds) {
         
         previousVertex = v;
         addVertex(&length, previousVertex,currentLine,l);
+        [(MHViewController*)self.viewController lineEnded];
     }
     
     [self setNeedsDisplay];

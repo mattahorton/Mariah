@@ -163,4 +163,16 @@
     [self.core setPitShiftFactor:ratio];
 }
 
+-(void)playback{
+    [self.core playback];
+}
+
+-(void)lineStarted{
+    [self.core unmute];
+}
+
+-(void)lineEnded{
+    [self.core mute];
+}
+
 @end
